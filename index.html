@@ -5,54 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>你好</title>
     <style>
-        /* 基础样式重置 */
         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden; /* 防止出现滚动条 */
-            background-color: #fdfdfd; /* 使用一个非常柔和的灰白色，避免纯白刺眼 */
+            overflow: hidden;
+            background-color: #fdfdfd;
         }
 
-        /* 容器样式，用于实现定位 */
         .container {
             display: flex;
-            justify-content: center; /* 水平居中 */
-            align-items: center;   /* 垂直居中 */
+            justify-content: center;
+            align-items: center;
             width: 100%;
             height: 100%;
-            padding-bottom: 10vh; /* 关键点：使用内边距将内容向上推，10vh表示视口高度的10% */
-            box-sizing: border-box; /* 确保内边距不会增加容器的总高度 */
+            padding-bottom: 10vh;
+            box-sizing: border-box;
+            flex-direction: column;
         }
 
-        /* 文字样式 */
         h1 {
-            font-size: 6vw; /* 使用vw单位，让字体大小与视口宽度成比例，实现平滑缩放 */
-            color: #2c2c2c;   /* 使用深灰色代替纯黑，视觉上更柔和 */
-            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", sans-serif; /* 优先使用更优雅的中文字体 */
-            font-weight: 300; /* 使用更细的字重，显得更精致 */
-            letter-spacing: 0.5em; /* 关键点：增加字间距，0.5em表示半个字体的宽度 */
-            margin-right: -0.5em; /* 修正由于最后一个字也增加了间距导致的不居中问题 */
+            font-size: 6vw;
+            color: #2c2c2c;
+            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", sans-serif;
+            font-weight: 300;
+            letter-spacing: 0.5em;
+            margin-right: -0.5em;
+            text-align: center;
+            margin-bottom: 2vh;
+        }
+        
+        p {
+            font-size: 1.5vw;
+            color: #6c6c6c;
+            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", sans-serif;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            margin-right: -0.2em;
             text-align: center;
         }
 
-        /* 媒体查询，为超大屏幕设置字体上限，避免过大 */
         @media (min-width: 1600px) {
             h1 {
-                font-size: 96px; /* 1600px * 6vw = 96px */
+                font-size: 96px;
+            }
+            p {
+                font-size: 24px;
             }
         }
 
-        /* 媒体查询，为手机等小屏幕设备调整 */
         @media (max-width: 600px) {
             h1 {
-                font-size: 10vw; /* 在小屏幕上使用更大的视口宽度比例 */
-                letter-spacing: 0.3em; /* 适当减小字间距 */
+                font-size: 10vw;
+                letter-spacing: 0.3em;
                 margin-right: -0.3em;
             }
+            p {
+                font-size: 2.8vw;
+                letter-spacing: 0.15em;
+                margin-right: -0.15em;
+            }
             .container {
-                padding-bottom: 15vh; /* 在手机上稍微再往上推一点 */
+                padding-bottom: 15vh;
             }
         }
     </style>
@@ -60,6 +75,7 @@
 <body>
     <div class="container">
         <h1>你好</h1>
+        <p>你可以发送邮件到e@iiioii.dpdns.org联系我…</p>
     </div>
 </body>
 </html>
