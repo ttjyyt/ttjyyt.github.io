@@ -1,80 +1,387 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>你好</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #fdfdfd;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的 IP 信息</title>
+  <style>
+    /* 全局变量与重置 */
+    :root {
+      --primary: #6366f1; /* Indigo */
+      --primary-dark: #4f46e5;
+      --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      --surface: #ffffff;
+      --text-main: #111827;
+      --text-sub: #6b7280;
+      --radius: 20px;
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
 
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            padding-bottom: 10vh;
-            box-sizing: border-box;
-            flex-direction: column;
-        }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        h1 {
-            font-size: 6vw;
-            color: #2c2c2c;
-            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", sans-serif;
-            font-weight: 300;
-            letter-spacing: 0.5em;
-            margin-right: -0.5em;
-            text-align: center;
-            margin-bottom: 2vh;
-        }
-        
-        p {
-            font-size: 1.5vw;
-            color: #6c6c6c;
-            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", sans-serif;
-            font-weight: 300;
-            letter-spacing: 0.2em;
-            margin-right: -0.2em;
-            text-align: center;
-        }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-main);
+      padding: 20px;
+    }
 
-        @media (min-width: 1600px) {
-            h1 {
-                font-size: 96px;
-            }
-            p {
-                font-size: 24px;
-            }
-        }
+    /* 卡片容器 */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 500px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover { transform: translateY(-2px); }
 
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 10vw;
-                letter-spacing: 0.3em;
-                margin-right: -0.3em;
-            }
-            p {
-                font-size: 2.8vw;
-                letter-spacing: 0.15em;
-                margin-right: -0.15em;
-            }
-            .container {
-                padding-bottom: 15vh;
-            }
-        }
-    </style>
+    /* 顶部 IP 展示区域 */
+    .header {
+      background: linear-gradient(to right, var(--primary), var(--primary-dark));
+      padding: 40px 30px;
+      text-align: center;
+      color: white;
+    }
+
+    .header-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .ip-address {
+      font-size: 2.5rem;
+      font-weight: 700;
+      font-family: 'Monaco', 'Consolas', monospace;
+      margin-bottom: 20px;
+      word-break: break-all;
+      line-height: 1.1;
+    }
+
+    /* 按钮组 */
+    .action-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .btn {
+      border: none;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .btn-white {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      backdrop-filter: blur(5px);
+    }
+    .btn-white:hover { background: rgba(255, 255, 255, 0.3); }
+    .btn-white:active { transform: scale(0.96); }
+
+    /* 详情列表 */
+    .details { padding: 30px; }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    /* 移除 display:none 元素的样式影响 */
+    .detail-item[style*="display: none"] { border: none; padding: 0; } 
+    .detail-item:last-child { border-bottom: none; }
+
+    .label {
+      color: var(--text-sub);
+      font-size: 0.95rem;
+      flex-shrink: 0; /* 防止标签换行 */
+    }
+
+    .value {
+      font-weight: 600;
+      color: var(--text-main);
+      text-align: right;
+      max-width: 60%;
+      word-wrap: break-word;
+    }
+
+    .map-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .map-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .map-link:hover { text-decoration: underline; }
+    
+    .third-party-tag {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        font-weight: 400;
+    }
+
+    /* 加载动画覆盖层 */
+    .loader-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      transition: opacity 0.3s;
+    }
+
+    .card.loaded .loader-overlay {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e5e7eb;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loading-text {
+      margin-top: 15px;
+      color: var(--text-sub);
+      font-size: 0.9rem;
+    }
+    
+    .error-box {
+      display: none;
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 10px;
+      text-align: center;
+      font-size: 0.9rem;
+      position: absolute;
+      width: 100%;
+      top: 0;
+      z-index: 20;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>你好</h1>
+
+  <div class="card" id="app-card">
+    <!-- 错误提示 -->
+    <div class="error-box" id="error-msg">查询失败，请检查网络</div>
+
+    <!-- 加载中 -->
+    <div class="loader-overlay" id="loader">
+      <div class="spinner"></div>
+      <div class="loading-text">正在定位...</div>
     </div>
+
+    <!-- 顶部 -->
+    <div class="header">
+      <div class="header-title">您的公网 IP</div>
+      <div class="ip-address" id="ip-display">...</div>
+      
+      <div class="action-row">
+        <button class="btn btn-white" id="copy-btn">
+          <span>📋</span> 复制
+        </button>
+        <button class="btn btn-white" id="refresh-btn">
+          <span>🔄</span> 刷新
+        </button>
+      </div>
+    </div>
+
+    <!-- 详情 (每一行都有 ID 以便控制显示/隐藏) -->
+    <div class="details">
+      <div class="detail-item" id="row-country">
+        <span class="label">国家/地区</span>
+        <span class="value" id="val-country">-</span>
+      </div>
+      
+      <div class="detail-item" id="row-region">
+        <span class="label">省份/区域</span>
+        <span class="value" id="val-region">-</span>
+      </div>
+
+      <div class="detail-item" id="row-city">
+        <span class="label">城市</span>
+        <span class="value" id="val-city">-</span>
+      </div>
+
+      <div class="detail-item" id="row-isp">
+        <span class="label">运营商 (ISP)</span>
+        <span class="value" id="val-isp">-</span>
+      </div>
+
+      <div class="detail-item" id="row-asn">
+        <span class="label">ASN</span>
+        <span class="value" id="val-asn">-</span>
+      </div>
+
+      <div class="detail-item" id="row-coords">
+        <span class="label">地理坐标</span>
+        <div class="value">
+          <span id="val-coords">-</span>
+          <div class="map-container" id="map-container" style="display:none">
+              <a href="#" target="_blank" id="link-map" class="map-link">查看地图</a>
+              <span class="third-party-tag">(第三方)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://ip.qwe.ae.kg/ip';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const els = {
+        card: document.getElementById('app-card'),
+        loader: document.getElementById('loader'),
+        ip: document.getElementById('ip-display'),
+        
+        // 获取行元素 (Row) 和 值元素 (Value)
+        rows: {
+            country: document.getElementById('row-country'),
+            region: document.getElementById('row-region'),
+            city: document.getElementById('row-city'),
+            isp: document.getElementById('row-isp'),
+            asn: document.getElementById('row-asn'),
+            coords: document.getElementById('row-coords')
+        },
+        vals: {
+            country: document.getElementById('val-country'),
+            region: document.getElementById('val-region'),
+            city: document.getElementById('val-city'),
+            isp: document.getElementById('val-isp'),
+            asn: document.getElementById('val-asn'),
+            coords: document.getElementById('val-coords')
+        },
+        mapContainer: document.getElementById('map-container'),
+        mapLink: document.getElementById('link-map'),
+        copyBtn: document.getElementById('copy-btn'),
+        refreshBtn: document.getElementById('refresh-btn'),
+        errorMsg: document.getElementById('error-msg')
+      };
+
+      async function fetchData() {
+        els.card.classList.remove('loaded');
+        els.errorMsg.style.display = 'none';
+
+        try {
+          const res = await fetch(API_URL);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          renderData(data);
+        } catch (e) {
+          console.error('Fetch Error:', e);
+          els.errorMsg.style.display = 'block';
+          els.errorMsg.textContent = '获取失败: ' + e.message;
+          els.ip.textContent = 'Error';
+        } finally {
+          setTimeout(() => els.card.classList.add('loaded'), 300);
+        }
+      }
+
+      // 辅助函数：如果有值且不是 Unknown，则显示；否则隐藏整行
+      function updateRow(rowEl, valEl, value) {
+        if (value && value.toString().trim().toLowerCase() !== 'unknown') {
+            valEl.textContent = value;
+            rowEl.style.display = 'flex';
+        } else {
+            rowEl.style.display = 'none';
+        }
+      }
+
+      function renderData(data) {
+        // 1. IP
+        els.ip.textContent = data.clientIp || '未知 IP';
+
+        if (data.geo) {
+          const g = data.geo;
+          
+          // 2. 使用辅助函数更新各行
+          updateRow(els.rows.country, els.vals.country, g.countryName);
+          updateRow(els.rows.region, els.vals.region, g.regionName);
+          updateRow(els.rows.city, els.vals.city, g.cityName);
+          updateRow(els.rows.isp, els.vals.isp, g.cisp);
+          
+          // ASN 特殊处理 (加前缀)
+          const asnText = g.asn ? `AS${g.asn}` : null;
+          updateRow(els.rows.asn, els.vals.asn, asnText);
+
+          // 3. 坐标与地图逻辑
+          if (g.latitude && g.longitude) {
+            els.rows.coords.style.display = 'flex'; // 显示坐标行
+            els.vals.coords.textContent = `${g.latitude.toFixed(2)}, ${g.longitude.toFixed(2)}`;
+            
+            // 判断是否为中国 (China 或 CN)
+            const isChina = (g.countryName === 'China' || (g.countryCodeAlpha2 && g.countryCodeAlpha2 === 'CN'));
+            
+            if (isChina) {
+                // 中国：Bing 地图 (搜索模式 - 方案2)
+                els.mapLink.textContent = 'Bing 地图';
+                els.mapLink.href = `https://www.bing.com/maps?q=${g.latitude},${g.longitude}`;
+            } else {
+                // 其他：Google 地图
+                els.mapLink.textContent = 'Google 地图';
+                els.mapLink.href = `https://www.google.com/maps/search/?api=1&query=${g.latitude},${g.longitude}`;
+            }
+            
+            els.mapContainer.style.display = 'inline-flex';
+          } else {
+            // 坐标不存在，隐藏整行
+            els.rows.coords.style.display = 'none';
+          }
+        }
+      }
+
+      els.copyBtn.addEventListener('click', () => {
+        const text = els.ip.textContent;
+        if (text && text !== '...' && text !== 'Error') {
+          navigator.clipboard.writeText(text)
+            .then(() => {
+                const original = els.copyBtn.innerHTML;
+                els.copyBtn.innerHTML = '<span>✔️</span> 已复制';
+                setTimeout(() => els.copyBtn.innerHTML = original, 2000);
+            })
+            .catch(() => alert('复制失败'));
+        }
+      });
+
+      els.refreshBtn.addEventListener('click', fetchData);
+      fetchData();
+    });
+  </script>
 </body>
 </html>
